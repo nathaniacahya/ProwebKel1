@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Register - Rumah Sakit Nasional</title>
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:700,400&display=swap" rel="stylesheet">
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            font-family: 'Montserrat', Arial, sans-serif;
+            background: #f8f8f8;
+            min-height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+        }
+        .container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            width: 100vw;
+            background: #f8f8f8;
+        }
+        .register-card {
+            background: #fff;
+            border-radius: 18px;
+            box-shadow: 0 6px 32px 0 rgba(44,62,80,0.10), 0 1.5px 6px 0 rgba(44,62,80,0.08);
+            padding: 48px 32px;
+            max-width: 480px;
+            width: 100%;
+            text-align: center;
+        }
+        .register-card .card-title {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 18px;
+        }
+        .input-group {
+            margin-bottom: 18px;
+            text-align: left;
+        }
+        .input-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 15px;
+            font-family: 'Montserrat', Arial, sans-serif;
+        }
+        .password-strength {
+            height: 5px;
+            border-radius: 5px;
+            margin-top: 10px;
+            width: 100%;
+            background-color: #e0e0e0;
+        }
+        .password-strength-bar {
+            height: 100%;
+            width: 0;
+            border-radius: 5px;
+            transition: width 0.3s ease;
+        }
+        button[type="submit"], .start-server-btn {
+            width: 100%;
+            padding: 10px;
+            background: linear-gradient(90deg, #3a8dde 0%, #4e6edb 100%);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+            font-size: 16px;
+            font-weight: 700;
+        }
+        .login-alt {
+            text-align: center;
+            margin-top: 25px;
+        }
+        .login-alt a {
+            color: #3a8dde;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .login-alt a:hover {
+            text-decoration: underline;
+        }
+        @media (max-width: 600px) {
+            .register-card {
+                padding: 24px 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="register-card">
+            <div class="card-title">Buat Akun Baru</div>
+            <form id="registerForm">
+                <div class="input-group">
+                    <input type="text" id="username" name="username" placeholder="Username" required />
+                </div>
+                <div class="input-group">
+                    <input type="email" id="email" name="email" placeholder="Email" required />
+                </div>
+                <div class="input-group">
+                    <input type="password" id="password" name="password" placeholder="Password" required />
+                    <div class="password-strength">
+                        <div id="password-strength-bar" class="password-strength-bar"></div>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Konfirmasi Password" required />
+                </div>
+                <div class="input-group">
+                    <input type="text" id="full_name" name="full_name" placeholder="Nama Lengkap" required />
+                </div>
+                <button type="submit">Daftar</button>
+                <p class="login-alt">Sudah punya akun? <a href="index.html">Login di sini</a></p>
+            </form>
+        </div>
+    </div>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.6.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.1/firebase-firestore.js"></script>
+    <script>
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+          apiKey: "AIzaSyAjnuZZl35fqv3QcTUa4LlnSlGWUlerFnw",
+          authDomain: "webtb-cf2b2.firebaseapp.com",
+          projectId: "webtb-cf2b2",
+          storageBucket: "webtb-cf2b2.firebasestorage.app",
+          messagingSenderId: "914416728252",
+          appId: "1:914416728252:web:3aab7f8c6bc8156c8938b9"
+        };
+
+        // Initialize Firebase
+        if (!firebase.apps.length) {
+          firebase.initializeApp(firebaseConfig);
+        }
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // Password strength function
+        function checkPasswordStrength(password) {
+            const strengthBar = document.getElementById("password-strength-bar");
+            let strength = 0;
+            if (/[a-z]/.test(password)) strength++;
+            if (/[A-Z]/.test(password)) strength++;
+            if (/\d/.test(password)) strength++;
+            if (/[!@#$%^&*(),.?":{}|<>]/.test(password)) strength++;
+            switch (strength) {
+                case 0:
+                    strengthBar.style.width = '0%';
+                    strengthBar.style.backgroundColor = '#e0e0e0';
+                    break;
+                case 1:
+                    strengthBar.style.width = '25%';
+                    strengthBar.style.backgroundColor = '#ff4d4d';
+                    break;
+                case 2:
+                    strengthBar.style.width = '50%';
+                    strengthBar.style.backgroundColor = '#ffcc00';
+                    break;
+                case 3:
+                    strengthBar.style.width = '75%';
+                    strengthBar.style.backgroundColor = '#4dff00';
+                    break;
+                case 4:
+                    strengthBar.style.width = '100%';
+                    strengthBar.style.backgroundColor = '#009900';
+                    break;
+            }
+        }
+        document.getElementById("password").addEventListener("input", function () {
+            const password = this.value;
+            checkPasswordStrength(password);
+        });
+
+        document.getElementById('registerForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            const username = document.getElementById("username").value.trim();
+            const email = document.getElementById("email").value.trim();
+            const password = document.getElementById("password").value.trim();
+            const confirmPassword = document.getElementById("confirmPassword").value.trim();
+            const fullName = document.getElementById("full_name").value.trim();
+            
+            if (password !== confirmPassword) {
+                alert("❌ Passwords do not match!");
+                return;
+            }
+
+            auth.createUserWithEmailAndPassword(email, password)
+                .then((userCredential) => {
+                    // Signed in 
+                    const user = userCredential.user;
+                    // Now, save additional user info to Firestore
+                    return db.collection("users").doc(user.uid).set({
+                        username: username,
+                        email: email,
+                        full_name: fullName,
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    }).then(() => {
+                        alert("✅ Registration successful!");
+                        window.location.href = "index.html";
+                    });
+                })
+                .catch((error) => {
+                    alert("❌ Registration failed: " + error.message);
+                    console.error("Registration error:", error);
+                });
+        });
+    </script>
+</body>
+</html>
